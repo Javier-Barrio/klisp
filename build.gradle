@@ -1,0 +1,29 @@
+buildscript {
+  ext.kotlin_version = '1.3.71'
+ repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+mainClassName = 'klisp.KlispKt'
+
+defaultTasks 'run'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+jar {
+  manifest { attributes 'Main-Class': 'klisp.KlispKt' }
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
