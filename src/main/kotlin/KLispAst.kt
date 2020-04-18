@@ -15,6 +15,10 @@ data class Number(val value: Double): Expression {
     override fun toString(): String = "$value"
 }
 
+data class KString(val value: String): Expression {
+    override fun toString(): String = value
+}
+
 fun Expression.numeric(): Double {
     if (this is Number)
         return this.value

@@ -2,6 +2,7 @@ package klisp.test
 
 import org.junit.Test
 import klisp.*
+import klisp.ast.KString
 import klisp.env.*
 import klisp.ast.Number
 import java.lang.StringBuilder
@@ -30,5 +31,13 @@ class SimpleTest {
                     "(begin (define circle-radius (lambda (r) (* pi (* r r))))\n" +
                                 "(circle-radius 3))")), global),
             Number(28.274333882308138))
+    }
+
+    @Test
+    fun strings() {
+        val global = Environment(null)
+        val expr = eval(parse(StringBuilder(
+                "(begin (define str \"foo\") (string-append str \"bar\"))")), global)
+        assertEquals(expr, KString("foobar"))
     }
 }

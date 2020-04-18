@@ -4,6 +4,7 @@ package klisp
 
 import klisp.ast.*
 import klisp.ast.Number
+import klisp.ast.KString
 import klisp.env.Environment
 import klisp.env.Fun
 import klisp.env.Procedure
@@ -26,6 +27,17 @@ fun pop(): String {
 
 fun peek(): String = tokens.first()
 
+// simple string with no escape sequences
+fun string(token: String): Expression {
+    if (!token.startsWith("\""))
+        throw IllegalArgumentException()
+    if (!token.endsWith("\""))
+        throw IllegalArgumentException()
+
+    return KString(token.removePrefix("\"").removeSuffix("\""))
+}
+
+// special forms
 fun form(token: String): Form {
     if ("if" == token)
         return if_()
@@ -90,9 +102,13 @@ fun expression(): Expression {
             return Number(double)
         } catch (ex: NumberFormatException) {
             try {
-                return form(token)
+                return string(token)
             } catch (ex: IllegalArgumentException) {
-                return Symbol(token)
+                try {
+                    return form(token)
+                } catch (ex: IllegalArgumentException) {
+                    return Symbol(token)
+                }
             }
         }
     }
@@ -115,6 +131,7 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
     is Number -> ast
     is Symbol -> env.find(ast.name)
     is Nil -> Nil()
+    is KString -> ast
 
     is Sexpression -> {
         val head = ast.list[0]
@@ -140,9 +157,13 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
             is Lambda -> Fun(head.expression, head.args, env)
 
             else -> {
-                val proc = eval(ast.list[0], env) as Procedure
-                val args = ast.list.subList(1, ast.list.size)
-                proc(*args.map { eval(it, env) }.toTypedArray())
+                val first = eval(ast.list[0], env)
+                if (first is Procedure) {
+                    val args = ast.list.subList(1, ast.list.size)
+                    first(*args.map { eval(it, env) }.toTypedArray())
+                } else {
+                    first // atoms evaluate to itself
+                }
             }
         }
     }

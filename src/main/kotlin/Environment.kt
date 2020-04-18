@@ -1,6 +1,7 @@
 package klisp.env
 
 import klisp.ast.Expression
+import klisp.ast.KString
 import klisp.ast.Nil
 import klisp.ast.Number
 import klisp.eval
@@ -44,6 +45,37 @@ class Environment(val parent: Environment?) {
         symbols["exit"] = object: Procedure {
             override operator fun invoke(vararg args: Expression): Expression {
                 exitProcess(0)
+            }
+        }
+
+        symbols["string-append"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                val buf = StringBuilder()
+                for (e in args)
+                    buf.append(e.toString())
+                return KString(buf.toString())
+            }
+        }
+
+        symbols["string-length"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                assert(args.size == 1)
+
+                val str = args[0] as KString
+                return Number(str.value.length.toDouble())
+            }
+        }
+
+        symbols["print"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                for (e in args) {
+                    if (e is KString)
+                        print("\"$e\"")
+                    else
+                        print(e)
+                }
+                println()
+                return Nil()
             }
         }
 
