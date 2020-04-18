@@ -2,31 +2,18 @@ package klisp.env
 
 import klisp.ast.Expression
 import klisp.ast.Number
-import klisp.ast.Integer
 import klisp.eval
 
 // Convenience method to convert a `klisp` expression list to a par of doubles for evaluation.
 fun toDoublePair(vararg args: Expression): Pair<Double, Double> {
     assert(args.size == 2)
 
-    val a: Double = if (args[0] is Number) {
-        (args[0] as Number).value
-    } else  { (args[0] as Integer).value.toDouble() }
-    val b: Double = if (args[1] is Number) {
-        (args[1] as Number).value
-    } else { (args[1] as Integer).value.toDouble() }
-
-    return Pair(a, b)
+    return Pair((args[0] as Number).value, (args[1] as Number).value)
 }
 
 fun toDoubleOne(vararg args: Expression): Double {
     assert(args.size == 1)
-
-    val expr = args.first()
-
-    return if (expr is Number)
-        expr.value
-    else (expr as Integer).value.toDouble()
+    return (args.first() as Number).value
 }
 
 interface Procedure: Expression {

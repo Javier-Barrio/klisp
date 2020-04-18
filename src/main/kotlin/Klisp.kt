@@ -3,6 +3,7 @@
 package klisp
 
 import klisp.ast.*
+import klisp.ast.Number
 import klisp.env.Environment
 import klisp.env.Fun
 import klisp.env.Procedure
@@ -82,7 +83,7 @@ fun expression(): Expression {
 
     try {
         val num = token.toInt()
-        return Integer(num)
+        return Number(num.toDouble())
     } catch (ex: NumberFormatException) {
         try {
             val double = token.toDouble()
@@ -108,7 +109,6 @@ fun parse(buffer: StringBuilder): Expression {
 }
 
 fun eval(ast: Expression, env: Environment): Expression = when (ast) {
-    is Integer -> ast
     is Number -> ast
     is Symbol -> env.find(ast.name)
 
@@ -124,7 +124,7 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
 
             is If -> {
                 val expr = eval(head.test, env)
-                assert(expr is Number || expr is Integer)
+                assert(expr is Number)
                 val test = expr.numeric()
 
                 if (test != 0.0)

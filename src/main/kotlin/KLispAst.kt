@@ -15,15 +15,9 @@ class Number(val value: Double): Expression {
     override fun toString(): String = "$value"
 }
 
-class Integer(val value: Int): Expression {
-    override fun toString(): String = "$value"
-}
-
 fun Expression.numeric(): Double {
     if (this is Number)
         return this.value
-    else if (this is Integer)
-        return this.value.toDouble()
 
     throw IllegalStateException("Expression.numeric $this")
 }
