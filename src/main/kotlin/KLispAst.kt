@@ -9,9 +9,9 @@ class Nil: Expression {
     override fun toString(): String = "nil"
 }
 
-class Symbol(val name: String): Expression
+data class Symbol(val name: String): Expression
 
-class Number(val value: Double): Expression {
+data class Number(val value: Double): Expression {
     override fun toString(): String = "$value"
 }
 

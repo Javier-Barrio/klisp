@@ -1,6 +1,7 @@
 package klisp.env
 
 import klisp.ast.Expression
+import klisp.ast.Nil
 import klisp.ast.Number
 import klisp.eval
 
@@ -25,6 +26,20 @@ class Environment(val parent: Environment?) {
     val symbols = HashMap<String, Expression>()
 
     init {
+        // stdlib
+        symbols["begin"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                var last: Expression = Nil()
+
+                for (i in 0 until args.size) {
+                    if (i == 0) continue
+                    last = eval(args[i], this@Environment)
+                }
+
+                return last
+            }
+        }
+
         // arith and relational ops
         symbols["+"] = object: Procedure {
                 override operator fun invoke(vararg args: Expression): Expression {
