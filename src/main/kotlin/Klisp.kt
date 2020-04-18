@@ -105,12 +105,16 @@ fun parse(buffer: StringBuilder): Expression {
             !it.isBlank() && !it.isEmpty()
         }
 
+    if (tokens.isEmpty())
+        return Nil()
+
     return expression() // root
 }
 
 fun eval(ast: Expression, env: Environment): Expression = when (ast) {
     is Number -> ast
     is Symbol -> env.find(ast.name)
+    is Nil -> Nil()
 
     is Sexpression -> {
         val head = ast.list[0]
@@ -149,8 +153,8 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
 }
 
 fun main() {
-    println("Hello, this is Klisp 1.0 (Cntl-D to exit)")
+    println("Hello, this is Klisp 1.0 (`exit` to quit)")
     val global = Environment(null)
     while (true)
-        print(eval(parse(read()), global))
+        println(eval(parse(read()), global))
 }

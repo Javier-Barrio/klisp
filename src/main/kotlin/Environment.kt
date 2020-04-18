@@ -4,6 +4,7 @@ import klisp.ast.Expression
 import klisp.ast.Nil
 import klisp.ast.Number
 import klisp.eval
+import kotlin.system.exitProcess
 
 // Convenience method to convert a `klisp` expression list to a par of doubles for evaluation.
 fun toDoublePair(vararg args: Expression): Pair<Double, Double> {
@@ -37,6 +38,12 @@ class Environment(val parent: Environment?) {
                 }
 
                 return last
+            }
+        }
+
+        symbols["exit"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                exitProcess(0)
             }
         }
 
@@ -137,7 +144,11 @@ class Environment(val parent: Environment?) {
     fun find(name: String): Expression {
         if (name in symbols)
             return symbols[name]!!
-        return parent!!.find(name)
+        try {
+            return parent!!.find(name)
+        } catch (ex: NullPointerException) {
+            return Nil()
+        }
     }
 }
 
