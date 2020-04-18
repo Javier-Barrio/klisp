@@ -11,7 +11,6 @@ import kotlin.test.assertTrue
 class SimpleTest {
     @Test
     fun simple() {
-        println("Hello, this is Klisp 1.0 (Cntl-D to exit)")
         val global = Environment(null)
         assertTrue {
             val expr = eval(parse(StringBuilder(
