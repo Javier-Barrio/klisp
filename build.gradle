@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
-mainClassName = 'klisp.KlispKt'
+mainClassName = 'klisp.main.MainKt'
 
 defaultTasks 'run'
 
@@ -26,6 +26,6 @@ dependencies {
 }
 
 jar {
-  manifest { attributes 'Main-Class': 'klisp.KlispKt' }
+  manifest { attributes 'Main-Class': 'klisp.main.MainKt' }
   from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
