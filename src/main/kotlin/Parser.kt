@@ -1,17 +1,7 @@
-// Klisp. A simple lisp interpreter based on lispy.py (see http://norvig.com/lispy.html)
+package klisp.parser
 
-package klisp
-
-import klisp.ast.*
-import klisp.ast.Number
-import klisp.ast.KString
-import klisp.env.Environment
-import klisp.env.Fun
-import klisp.env.Procedure
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
-import java.lang.NumberFormatException
-import java.lang.RuntimeException
+import klisp.objects.*
+import klisp.objects.Number
 
 var tokens = emptyList<String>()
 
@@ -39,7 +29,7 @@ fun string(token: String): Expression {
 }
 
 // special forms
-fun form(token: String): Form {
+fun form(token: String): Expression {
     if ("if" == token)
         return if_()
     if ("define" == token)
@@ -55,18 +45,18 @@ fun form(token: String): Form {
 }
 
 // set! symbol expr
-fun set(): Form {
+fun set(): Expression {
     val symbol = Symbol(pop())
     return Sets(symbol, expression())
 }
 
 // quote (1 2 3)
-fun quote(): Form {
+fun quote(): Expression {
     return Quote(expression())
 }
 
 // if (+ a b) c a
-fun if_(): Form {
+fun if_(): Expression {
     val test = expression()
     val c = expression()
     val a = expression()
@@ -74,12 +64,12 @@ fun if_(): Form {
 }
 
 // define foo expr
-fun define(): Form {
+fun define(): Expression {
     return Define(pop(), expression())
 }
 
 // lambda (n) (+ 1 n)
-fun lambda(): Form {
+fun lambda(): Expression {
     var params: List<String> = mutableListOf()
 
     if (peek() != "(")
@@ -132,78 +122,13 @@ fun expression(): Expression {
 
 fun parse(buffer: StringBuilder): Expression {
     tokens = buffer.replace(Regex("\\("), " ( ")
-        .replace(")", " ) ")
-        .split(" ").filter {
-            !it.isBlank() && !it.isEmpty()
-        }
+            .replace(")", " ) ")
+            .split(" ").filter {
+                !it.isBlank() && !it.isEmpty()
+            }
 
     if (tokens.isEmpty())
         return Nil
 
     return expression() // root
-}
-
-fun eval(ast: Expression, env: Environment): Expression = when (ast) {
-    is Number -> ast
-    is Symbol -> env.find(ast.name)
-    is Nil -> Nil
-    is KString -> ast
-    is Quote -> ast.expression
-
-    is Sexpression -> {
-        val head = ast.list[0]
-        when (head) {
-            is Define -> {
-                val symbol = head.symbol
-                val expr = head.expression
-                env.symbols[symbol] = eval(expr, env)
-                Nil
-            }
-
-            is If -> {
-                val expr = eval(head.test, env)
-                assert(expr is Number)
-                val test = expr.numeric()
-
-                if (test != 0.0)
-                    eval(head.c, env)
-                else
-                    eval(head.a, env)
-            }
-
-            is Lambda -> Fun(head.expression, head.args, env)
-
-            is Quote -> head
-
-            is Sets -> {
-                env.symbols[head.symbol.name] = eval(head.expression, env)
-                Nil
-            }
-
-            else -> {
-                val first = eval(ast.list[0], env)
-
-                if (first !is Procedure)
-                    throw IllegalStateException("eval: $head is not a procedure")
-
-                val args = ast.list.subList(1, ast.list.size)
-                first(*args.map { eval(it, env) }.toTypedArray())
-            }
-        }
-    }
-
-    else -> {
-        throw IllegalStateException("eval $ast")
-    }
-}
-
-fun main() {
-    println("Hello, this is Klisp 1.0 (`exit` to quit)")
-    val global = Environment(null)
-    while (true)
-        try {
-            println(eval(parse(read()), global))
-        } catch (ex: RuntimeException) {
-            println("runtime error: $ex")
-        }
 }

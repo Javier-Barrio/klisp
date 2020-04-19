@@ -1,7 +1,7 @@
 package klisp.env
 
-import klisp.ast.*
-import klisp.ast.Number
+import klisp.objects.*
+import klisp.objects.Number
 import klisp.eval
 import kotlin.system.exitProcess
 

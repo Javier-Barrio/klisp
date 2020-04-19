@@ -2,13 +2,13 @@ package klisp.test
 
 import org.junit.Test
 import klisp.*
-import klisp.ast.KString
+import klisp.objects.KString
 import klisp.env.*
-import klisp.ast.Number
-import klisp.ast.Sexpression
+import klisp.objects.Number
+import klisp.objects.Sexpression
+import klisp.parser.parse
 import java.lang.StringBuilder
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class SimpleTest {
     @Test
