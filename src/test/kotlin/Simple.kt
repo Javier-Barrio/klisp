@@ -14,12 +14,10 @@ class SimpleTest {
     @Test
     fun simple() {
         val global = Environment(null)
-        assertTrue {
-            val expr = eval(parse(StringBuilder(
-                    "(begin (define fact (lambda (n) (if (< n 2) 1 (* n (fact (- n 1))))))\n" +
-                "(fact 4))")), global)
-            expr == Number(24.0)
-        }
+        val code = "(begin (define fact (lambda (n) (if (< n 2) 1 (* n (fact (- n 1)))))) (fact 4))"
+        val expr = eval(parse(StringBuilder(code)), global)
+
+        assertEquals(Number(24.0), expr)
 
         assertEquals(
             eval(parse(StringBuilder(

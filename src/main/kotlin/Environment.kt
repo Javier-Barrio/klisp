@@ -77,34 +77,26 @@ class Environment(val parent: Environment?) {
             }
         }
 
-        // arith and relational ops
-        symbols["+"] = object: Procedure {
+        fun arithop(apply: (accum: Number, arg: Number) -> Number): Expression {
+            return object: Procedure {
                 override operator fun invoke(vararg args: Expression): Expression {
-                    val (a, b) = toDoublePair(*args)
-                    return Number(a + b)
+                    var result = Number(args[0].numeric())
+                    for (e in args.asIterable().drop(1).map { it as Number }) {
+                        result = apply(result, e)
+                    }
+                    return result
                 }
-        }
-
-        symbols["-"] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(a - b)
             }
         }
 
-        symbols["*"] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(a * b)
-            }
-        }
+        // arith and relational ops
+        symbols["+"] = arithop { acc: Number, arg: Number -> Number(acc.value + arg.value) }
 
-        symbols["/"] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(a / b)
-            }
-        }
+        symbols["-"] = arithop {acc: Number, arg: Number -> Number(acc.value - arg.value) }
+
+        symbols["*"] = arithop {acc: Number, arg: Number -> Number(acc.value * arg.value) }
+
+        symbols["/"] = arithop {acc: Number, arg: Number -> Number(acc.value / arg.value) }
 
         symbols["="] = object: Procedure {
             override operator fun invoke(vararg args: Expression): Expression {

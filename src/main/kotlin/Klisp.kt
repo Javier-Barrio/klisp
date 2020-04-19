@@ -46,7 +46,7 @@ fun form(token: String): Form {
         return define()
     if ("lambda" == token)
         return lambda()
-    if ("quote" == token)
+    if ("quote" == token || token.first() == '\'')
         return quote()
     if ("set!" == token)
         return set()
