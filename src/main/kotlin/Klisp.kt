@@ -11,6 +11,7 @@ import klisp.env.Procedure
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.NumberFormatException
+import java.lang.RuntimeException
 
 var tokens = emptyList<String>()
 
@@ -45,8 +46,23 @@ fun form(token: String): Form {
         return define()
     if ("lambda" == token)
         return lambda()
+    if ("quote" == token)
+        return quote()
+    if ("set!" == token)
+        return set()
 
     throw IllegalArgumentException("not a form: $token")
+}
+
+// set! symbol expr
+fun set(): Form {
+    val symbol = Symbol(pop())
+    return Sets(symbol, expression())
+}
+
+// quote (1 2 3)
+fun quote(): Form {
+    return Quote(expression())
 }
 
 // if (+ a b) c a
@@ -122,7 +138,7 @@ fun parse(buffer: StringBuilder): Expression {
         }
 
     if (tokens.isEmpty())
-        return Nil()
+        return Nil
 
     return expression() // root
 }
@@ -130,8 +146,9 @@ fun parse(buffer: StringBuilder): Expression {
 fun eval(ast: Expression, env: Environment): Expression = when (ast) {
     is Number -> ast
     is Symbol -> env.find(ast.name)
-    is Nil -> Nil()
+    is Nil -> Nil
     is KString -> ast
+    is Quote -> ast.expression
 
     is Sexpression -> {
         val head = ast.list[0]
@@ -140,7 +157,7 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
                 val symbol = head.symbol
                 val expr = head.expression
                 env.symbols[symbol] = eval(expr, env)
-                Nil()
+                Nil
             }
 
             is If -> {
@@ -156,14 +173,21 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
 
             is Lambda -> Fun(head.expression, head.args, env)
 
+            is Quote -> head
+
+            is Sets -> {
+                env.symbols[head.symbol.name] = eval(head.expression, env)
+                Nil
+            }
+
             else -> {
                 val first = eval(ast.list[0], env)
-                if (first is Procedure) {
-                    val args = ast.list.subList(1, ast.list.size)
-                    first(*args.map { eval(it, env) }.toTypedArray())
-                } else {
-                    first // atoms evaluate to itself
-                }
+
+                if (first !is Procedure)
+                    throw IllegalStateException("eval: $head is not a procedure")
+
+                val args = ast.list.subList(1, ast.list.size)
+                first(*args.map { eval(it, env) }.toTypedArray())
             }
         }
     }
@@ -177,5 +201,9 @@ fun main() {
     println("Hello, this is Klisp 1.0 (`exit` to quit)")
     val global = Environment(null)
     while (true)
-        println(eval(parse(read()), global))
+        try {
+            println(eval(parse(read()), global))
+        } catch (ex: RuntimeException) {
+            println("runtime error: $ex")
+        }
 }

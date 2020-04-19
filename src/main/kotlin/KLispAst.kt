@@ -1,11 +1,12 @@
 package klisp.ast
 
 import java.lang.IllegalStateException
+import java.lang.StringBuilder
 
 interface Expression
 sealed class Form: Expression
 
-class Nil: Expression {
+object Nil: Expression {
     override fun toString(): String = "nil"
 }
 
@@ -26,7 +27,17 @@ fun Expression.numeric(): Double {
     throw IllegalStateException("Expression.numeric $this")
 }
 
-class Sexpression(val list: List<Expression>): Expression
-class Define(val symbol: String, val expression: Expression): Form()
-class Lambda(val args: List<String>, val expression: Expression): Form()
-class If(val test: Expression, val c: Expression, val a: Expression): Form()
+data class Sexpression(val list: List<Expression>): Expression {
+    override fun toString(): String {
+        val buf = StringBuilder("(")
+        for (e in list)
+            buf.append(" $e ")
+        return buf.append(")").toString()
+    }
+}
+
+data class Define(val symbol: String, val expression: Expression): Form()
+data class Lambda(val args: List<String>, val expression: Expression): Form()
+data class If(val test: Expression, val c: Expression, val a: Expression): Form()
+data class Quote(val expression: Expression): Form()
+data class Sets(val symbol: Symbol, val expression: Expression): Form()

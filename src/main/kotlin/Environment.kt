@@ -1,8 +1,6 @@
 package klisp.env
 
-import klisp.ast.Expression
-import klisp.ast.KString
-import klisp.ast.Nil
+import klisp.ast.*
 import klisp.ast.Number
 import klisp.eval
 import kotlin.system.exitProcess
@@ -31,7 +29,7 @@ class Environment(val parent: Environment?) {
         // stdlib
         symbols["begin"] = object: Procedure {
             override operator fun invoke(vararg args: Expression): Expression {
-                var last: Expression = Nil()
+                var last: Expression = Nil
 
                 for (i in 0 until args.size) {
                     if (i == 0) continue
@@ -75,7 +73,7 @@ class Environment(val parent: Environment?) {
                         print(e)
                 }
                 println()
-                return Nil()
+                return Nil
             }
         }
 
@@ -179,7 +177,7 @@ class Environment(val parent: Environment?) {
         try {
             return parent!!.find(name)
         } catch (ex: NullPointerException) {
-            return Nil()
+            return Nil
         }
     }
 }

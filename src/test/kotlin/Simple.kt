@@ -5,6 +5,7 @@ import klisp.*
 import klisp.ast.KString
 import klisp.env.*
 import klisp.ast.Number
+import klisp.ast.Sexpression
 import java.lang.StringBuilder
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -39,5 +40,21 @@ class SimpleTest {
         val expr = eval(parse(StringBuilder(
                 "(begin (define str \"foo\") (string-append str \"bar\"))")), global)
         assertEquals(expr, KString("foobar"))
+    }
+
+    @Test
+    fun quotes() {
+        val code = "(begin (define foo (quote (1 2 3))) foo)"
+        val env = Environment(null)
+        val ret = eval(parse(StringBuilder(code)), env)
+        assertEquals(Sexpression(listOf(Number(1.0), Number(2.0), Number(3.0))), ret)
+    }
+
+    @Test
+    fun setsymbol() {
+        val code = "(begin (define foo (quote (1 2 3))) foo (set! foo (lambda (x) (* x x))) (foo 2))"
+        val env = Environment(null)
+        val ret = eval(parse(StringBuilder(code)), env)
+        assertEquals(Number(4.0), ret)
     }
 }
