@@ -98,40 +98,24 @@ class Environment(val parent: Environment?) {
 
         symbols["/"] = arithop {acc: Number, arg: Number -> Number(acc.value / arg.value) }
 
-        symbols["="] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(if (a == b) 1.0 else 0.0)
+        fun relaop(apply: (Double, Double) -> Double): Procedure {
+            return object: Procedure {
+                override operator fun invoke(vararg args: Expression): Expression {
+                    val (a, b) = toDoublePair(*args)
+                    return Number(apply(a, b))
+                }
             }
         }
 
-        symbols["<="] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(if (a <= b) 1.0 else 0.0)
-            }
-        }
+        symbols["="] = relaop { a: Double, b: Double -> if (a == b) 1.0 else 0.0 }
 
-        symbols[">="] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(if (a >= b) 1.0 else 0.0)
-            }
-        }
+        symbols["<="] = relaop { a: Double, b: Double -> if (a <= b) 1.0 else 0.0 }
 
-        symbols["<"] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(if (a < b) 1.0 else 0.0)
-            }
-        }
+        symbols[">="] = relaop { a: Double, b: Double -> if (a >= b) 1.0 else 0.0 }
 
-        symbols[">"] = object: Procedure {
-            override operator fun invoke(vararg args: Expression): Expression {
-                val (a, b) = toDoublePair(*args)
-                return Number(if (a > b) 1.0 else 0.0)
-            }
-        }
+        symbols["<"] = relaop { a: Double, b: Double -> if (a < b) 1.0 else 0.0 }
+
+        symbols[">"] = relaop { a: Double, b: Double -> if (a > b) 1.0 else 0.0 }
 
         // math
         symbols["pi"] = Number(Math.PI)
