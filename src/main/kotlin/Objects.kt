@@ -27,7 +27,9 @@ object Nil: Expression {
     override fun toString(): String = "nil"
 }
 
-data class Symbol(val name: String): Expression
+data class Symbol(val name: String): Expression {
+    override fun toString(): String = "$name"
+}
 
 data class Number(val value: Double): Expression {
     override fun toString(): String = "$value"

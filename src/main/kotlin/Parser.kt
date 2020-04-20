@@ -36,8 +36,6 @@ fun form(token: String): Expression {
         return define()
     if ("lambda" == token)
         return lambda()
-    if ("quote" == token || token.first() == '\'')
-        return quote()
     if ("set!" == token)
         return set()
 
@@ -48,11 +46,6 @@ fun form(token: String): Expression {
 fun set(): Expression {
     val symbol = Symbol(pop())
     return Sets(symbol, expression())
-}
-
-// quote (1 2 3)
-fun quote(): Expression {
-    return Quote(expression())
 }
 
 // if (+ a b) c a
