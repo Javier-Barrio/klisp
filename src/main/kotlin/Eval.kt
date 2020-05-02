@@ -32,13 +32,6 @@ private fun sets(head: Sets, env: Environment): Nil {
 }
 
 private fun procedure(ast: Sexpression, env: Environment): Expression {
-
-    try {
-        return quotation(ast)
-    } catch (ex: IllegalStateException) {
-        // fallthrough
-    }
-
     val first = eval(ast.list[0], env)
 
     if (first !is Procedure)
@@ -46,15 +39,6 @@ private fun procedure(ast: Sexpression, env: Environment): Expression {
 
     val args = ast.list.subList(1, ast.list.size)
     return first(*args.map { eval(it, env) }.toTypedArray())
-}
-
-private fun quotation(ast: Sexpression): Expression {
-    val symbol = ast.list[0] as Symbol
-
-    if (symbol.name != "quote")
-        throw IllegalStateException()
-
-     return ast.list.drop(1).first()
 }
 
 fun eval(ast: Expression, env: Environment): Expression = when (ast) {
@@ -72,6 +56,7 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
             is If -> if_(head, env)
             is Lambda -> Fun(head.expression, head.args, env)
             is Sets -> sets(head, env)
+            is Quote -> head.expression
             else -> procedure(ast, env)
         }
     }

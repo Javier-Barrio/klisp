@@ -4,9 +4,12 @@ import org.junit.Test
 import klisp.*
 import klisp.objects.KString
 import klisp.env.*
+import klisp.objects.Expression
 import klisp.objects.Number
 import klisp.objects.Sexpression
 import klisp.parser.parse
+import java.lang.AssertionError
+import java.lang.Exception
 import java.lang.StringBuilder
 import kotlin.test.assertEquals
 
@@ -42,18 +45,10 @@ class SimpleTest {
 
     @Test
     fun quote1() {
-        val code = "(begin quote (1 2 3))"
+        val code = "(quote (1 2 3))"
         val env = Environment(null)
         val ret = eval(parse(StringBuilder(code)), env)
         assertEquals(Sexpression(listOf(Number(1.0), Number(2.0), Number(3.0))), ret)
-    }
-
-    @Test
-    fun quote2() {
-        val code = "(begin (+ (quote 1) 2 3))"
-        val env = Environment(null)
-        val ret = eval(parse(StringBuilder(code)), env)
-        assertEquals(Sexpression(listOf(Number(6.0))), ret)
     }
 
     @Test

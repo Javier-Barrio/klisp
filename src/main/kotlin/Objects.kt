@@ -43,5 +43,7 @@ data class KString(val value: String): Expression {
 data class Define(val symbol: String, val expression: Expression): Expression
 data class Lambda(val args: List<String>, val expression: Expression): Expression
 data class If(val test: Expression, val c: Expression, val a: Expression): Expression
-data class Quote(val expression: Expression): Expression
+data class Quote(val expression: Expression): Expression {
+    override fun toString(): String = expression.toString()
+}
 data class Sets(val symbol: Symbol, val expression: Expression): Expression

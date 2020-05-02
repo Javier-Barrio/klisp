@@ -38,8 +38,14 @@ fun form(token: String): Expression {
         return lambda()
     if ("set!" == token)
         return set()
+    if ("quote" == token)
+        return quote()
 
     throw IllegalArgumentException("not a form: $token")
+}
+
+fun quote(): Expression {
+    return Quote(expression())
 }
 
 // set! symbol expr
