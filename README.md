@@ -1,10 +1,10 @@
-#Klisp -- a small lisp-y interpreter written in Kotlin.
+# Klisp -- a small lisp-y interpreter written in Kotlin.
 
 Klisp is based on lis.py (see http://norvig.com/lispy.html).
 
 This is a project written for educational purposes and is not intended to be used in production environments.
 
-##Example programs
+## Example programs
 
 Factorial
 ```
@@ -14,4 +14,9 @@ Factorial
                     1 
                     (* n (fact (- n 1)))))) 
         (fact 4))
+```
+
+Lists and quote
+```
+(cdr (quote (rose mary juan)))
 ```
