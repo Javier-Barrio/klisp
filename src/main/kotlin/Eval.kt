@@ -37,7 +37,7 @@ private fun procedure(ast: Sexpression, env: Environment): Expression {
     if (first !is Procedure)
         throw IllegalStateException("eval: $first is not a procedure")
 
-    val args = ast.list.subList(1, ast.list.size)
+    val args = ast.list.drop(1)
     return first(*args.map { eval(it, env) }.toTypedArray())
 }
 
