@@ -3,6 +3,7 @@ package klisp.env
 import klisp.objects.*
 import klisp.objects.Number
 import klisp.eval
+import java.lang.IllegalStateException
 import kotlin.system.exitProcess
 
 // Convenience method to convert a `klisp` expression list to a par of doubles for evaluation.
@@ -27,6 +28,52 @@ class Environment(val parent: Environment?) {
 
     init {
         // stdlib
+        symbols["list"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                var expressions = emptyList<Expression>()
+                for (e in args) {
+                    expressions += eval(e, this@Environment)
+                }
+
+                return Sexpression(expressions)
+            }
+        }
+
+        symbols["car"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                val list = args[0]
+
+                if (list !is Sexpression)
+                    throw IllegalStateException("invalid arguments to `car`: $list")
+
+                return eval(list.list.first(), this@Environment)
+            }
+        }
+
+        symbols["cdr"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                val list = args[0]
+
+                if (list !is Sexpression)
+                    throw IllegalStateException("invalid arguments to `cdr`: $list")
+
+                val rest = list.list.drop(1)
+                return (symbols["list"]!! as Procedure)(*rest.toTypedArray())
+            }
+        }
+
+        symbols["cons"] = object: Procedure {
+            override operator fun invoke(vararg args: Expression): Expression {
+                val first = listOf(args[0])
+                val list = args[1]
+
+                if (list !is Sexpression)
+                    throw IllegalStateException("invalid arguments to `cons`: $list")
+
+                return Sexpression(first + list.list)
+            }
+        }
+
         symbols["begin"] = object: Procedure {
             override operator fun invoke(vararg args: Expression): Expression {
                 var last: Expression = Nil

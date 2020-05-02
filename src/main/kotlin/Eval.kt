@@ -41,6 +41,15 @@ private fun procedure(ast: Sexpression, env: Environment): Expression {
     return first(*args.map { eval(it, env) }.toTypedArray())
 }
 
+private fun quote(ast: Sexpression): Expression {
+    return Sexpression(ast.list.map {
+        if (it is Symbol)
+            KString(it.name)
+        else
+            it
+    })
+}
+
 fun eval(ast: Expression, env: Environment): Expression = when (ast) {
     // atoms
     is Number -> ast
@@ -56,7 +65,7 @@ fun eval(ast: Expression, env: Environment): Expression = when (ast) {
             is If -> if_(head, env)
             is Lambda -> Fun(head.expression, head.args, env)
             is Sets -> sets(head, env)
-            is Quote -> head.expression
+            is Quote -> quote(head.expression as Sexpression)
             else -> procedure(ast, env)
         }
     }

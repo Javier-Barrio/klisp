@@ -52,6 +52,22 @@ class SimpleTest {
     }
 
     @Test
+    fun quote2() {
+        val code = "(car (quote (rose mary juan)))"
+        val env = Environment(null)
+        val ret = eval(parse(StringBuilder(code)), env)
+        assertEquals(KString("rose"), ret)
+    }
+
+    @Test
+    fun quote3() {
+        val code = "(cdr (quote (rose mary juan)))"
+        val env = Environment(null)
+        val ret = eval(parse(StringBuilder(code)), env)
+        assertEquals(Sexpression(listOf(KString("mary"), KString("juan"))), ret)
+    }
+
+    @Test
     fun setsymbol() {
         val code = "(begin (define foo 1) (set! foo (lambda (x) (* x x))) (foo 2))"
         val env = Environment(null)
