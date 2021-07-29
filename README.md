@@ -2,7 +2,7 @@
 
 Klisp is based on lis.py (see http://norvig.com/lispy.html).
 
-This is a project written for educational purposes and is not intended to be used in production environments.
+The project is written for educational purposes and is not intended to be used in production environments.
 
 ## Running Klisp
 Build and run REPL (requires Java and Gradle in `$PATH`)
